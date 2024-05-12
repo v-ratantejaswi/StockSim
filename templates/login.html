@@ -67,12 +67,17 @@
             text-align: right;
         }
 
+        .navbar-dollar {
+            font-size: 1.5rem;
+            margin-right: -1px;
+        }
+
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}">StockSim</a>
+            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}"><span class="navbar-dollar">💰</span>tockSim</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -89,12 +94,19 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                         </li>
+                        
                     {% else %}
                         <li class="nav-item">
                             <a class="nav-link active" href="{{ url_for('login') }}">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('signup') }}">Signup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" onclick = "showPopup();return false;" >🔒 Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ url_for('about') }}">About</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -128,13 +140,18 @@
                     <a href="/signup" class="btn btn-secondary">Signup</a>
                 </div>
                 <div class="forgot-password">
-                    <a href="/forgot-password" class="btn btn-link">Forgot Password?</a>
+                    <a href="/forgot-password" class="btn btn-link">Forgot Password?Change it here!</a>
                 </div>
 
                 
             </form>
         </div>
     </div>
+    <script>
+        function showPopup() {
+            alert("Please login to access trade and other features like view stock news.");
+        }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

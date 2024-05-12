@@ -173,6 +173,10 @@
             height: 3rem; /* Size of the spinner */
             margin-bottom: 0.5rem; /* Space between spinner and text */
         }
+        .navbar-dollar {
+            font-size: 1.5rem;
+            margin-right: -1px;
+        }
     </style>
     
     
@@ -180,7 +184,7 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}">StockSim</a>
+            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}"><span class="navbar-dollar">💰</span>tockSim</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -211,6 +215,12 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('signup') }}">Signup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" onclick = "showPopup();return false;" >🔒 Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ url_for('about') }}">About</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -244,6 +254,11 @@
 
 
     <script>
+        function showPopup() {
+            alert('Please login to access trade and other features like view stock news.');
+            
+        }
+
         $(document).ready(function() {
             // Default stock symbol (Apple Inc.)
             const defaultStock = "AAPL-Apple Inc. Common Stock";

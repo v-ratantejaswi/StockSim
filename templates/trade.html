@@ -177,6 +177,10 @@
             height: 3rem; /* Size of the spinner */
             margin-bottom: 0.5rem; /* Space between spinner and text */
         }
+        .navbar-dollar {
+            font-size: 1.5rem;
+            margin-right: -1px;
+        }
     </style>
     
     
@@ -184,7 +188,7 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}">StockSim</a>
+            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}"><span class="navbar-dollar">💰</span>tockSim</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -193,9 +197,7 @@
                     <li class="nav-item">
                         <a class="nav-link " href="{{ url_for('index') }}" aria-current="page">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
-                    </li>
+
                     {% if 'user_name' in session %}
                         <li class="nav-item">
                             <a class="nav-link " href="{{ url_for('portfolio') }}">Portfolio</a>
@@ -207,9 +209,15 @@
                             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link " href="{{ url_for('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link disabled" style="font-weight: bold; color: green;" id="navbarBalance">Balance: ${{ balance }}</a>
                         </li>
                     {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
                         </li>
@@ -231,8 +239,12 @@
         <div id="cardsContainer">
             <div id="leftCard">
                 <div id="stockInfo" style="text-align: center;color: black;"></div>
-                <br>
+                <button id="newsButton" class="btn btn-info" style="">View News</button>
 
+                <div id="stockOwnership" style="padding: 10px; font-size: 16px; color: black;"></div>
+
+                <br>
+                <h3>Buy/Sell Stock</h3>
                 <!-- Radio Buttons for Selecting Transaction Type -->
                 <div class="transaction-type">
                     <div class="form-check">
@@ -270,6 +282,9 @@
                 
                 <canvas id="stockChart"></canvas><br>
                 
+                <p id ="stockSummary"> </p>
+                
+                
             </div>
         </div>
     </div>
@@ -278,10 +293,66 @@
 
     <script>
         $(document).ready(function() {
+            // $('#buyButton').click(function() {
+            //     var symbol = $('#inputField').val(); // Assuming the input format is "SYMBOL-Name"
+            //     var amount = $('#quantity').val();
+            //     var transactionType = $('input[name="transactionType"]:checked').val(); // Gets the checked radio button value
+
+            //     if (symbol && amount) {
+            //         $.ajax({
+            //             url: '/buy_stock',
+            //             method: 'POST',
+            //             contentType: 'application/json',
+            //             data: JSON.stringify({
+            //                 symbol: symbol,
+            //                 amount: amount,
+            //                 type: transactionType
+            //             }),
+            //             success: function(response) {
+            //                 alert('Stock purchased successfully. New Balance: $' + response.new_balance);
+            //                 $('#navbarBalance').text('Balance: $' + response.new_balance); // Update the displayed balance
+            //             },
+            //             error: function(xhr) {
+            //                 alert('Error: ' + xhr.responseJSON.error);
+            //             }
+            //         });
+            //     } else {
+            //         alert('Please enter a valid symbol and quantity.');
+            //     }
+            // });
+
+            // $('#sellButton').click(function() {
+            //     var symbol = $('#inputField').val();
+            //     var amount = $('#quantity').val();
+            //     var transactionType = $('input[name="transactionType"]:checked').val();
+
+            //     if (symbol && amount) {
+            //         $.ajax({
+            //             url: '/sell_stock',
+            //             method: 'POST',
+            //             contentType: 'application/json',
+            //             data: JSON.stringify({
+            //                 symbol: symbol,
+            //                 amount: amount,
+            //                 type: transactionType
+            //             }),
+            //             success: function(response) {
+            //                 alert('Stock sold successfully. New Balance: $' + response.new_balance);
+            //                 $('#navbarBalance').text('Balance: $' + response.new_balance);
+            //             },
+            //             error: function(xhr) {
+            //                 alert('Error: ' + xhr.responseJSON.error);
+            //             }
+            //         });
+            //     } else {
+            //         alert('Please enter a valid symbol and quantity.');
+            //     }
+            // });
+
             $('#buyButton').click(function() {
-                var symbol = $('#inputField').val(); // Assuming the input format is "SYMBOL-Name"
+                var symbol = $('#inputField').val();
                 var amount = $('#quantity').val();
-                var transactionType = $('input[name="transactionType"]:checked').val(); // Gets the checked radio button value
+                var transactionType = $('input[name="transactionType"]:checked').val();
 
                 if (symbol && amount) {
                     $.ajax({
@@ -294,8 +365,10 @@
                             type: transactionType
                         }),
                         success: function(response) {
+                            $('#navbarBalance').text('Balance: $' + response.new_balance);
+                            updateStockInfo(symbol);  // Update the shares owned and current value
                             alert('Stock purchased successfully. New Balance: $' + response.new_balance);
-                            $('#navbarBalance').text('$' + response.new_balance); // Update the displayed balance
+
                         },
                         error: function(xhr) {
                             alert('Error: ' + xhr.responseJSON.error);
@@ -322,8 +395,10 @@
                             type: transactionType
                         }),
                         success: function(response) {
-                            alert('Stock sold successfully. New Balance: $' + response.new_balance);
                             $('#navbarBalance').text('Balance: $' + response.new_balance);
+                            updateStockInfo(symbol);  // Update the shares owned and current value
+                            alert('Stock sold successfully. New Balance: $' + response.new_balance);
+
                         },
                         error: function(xhr) {
                             alert('Error: ' + xhr.responseJSON.error);
@@ -334,12 +409,16 @@
                 }
             });
 
+
+
             $('#quantity').on('input', function() {
                 var value = $(this).val();
                 if (value.indexOf('.') !== -1 && value.split('.')[1].length > 2) {
                     $(this).val(parseFloat(value).toFixed(2));
                 }
             });
+
+            
 
             
 
@@ -446,8 +525,7 @@
                     showLoadingIndicator(); // Show loading indicator when the button is clicked
                     $.when(
                         updateStockInfo(symbol),  // Fetch and display stock info
-                        plotStockData(symbol, '1d'),
-                        plotStockData(symbol, '1d')  
+                        plotStockData(symbol, '1d') 
                     ).then(() => {
                         hideLoadingIndicator();
                         scheduleAutoRefresh(symbol); // Schedule the periodic data refresh
@@ -615,6 +693,22 @@
                         '</table><br>' ;
                     $('#stockInfo').html(infoHtml);
                     $('#stockSummary').html(data.summary);
+                    $.getJSON('/get_stock_ownership', {symbol: symbol}, function(ownershipData) {
+                        var ownedShares = ownershipData.owned_stocks;
+                        var currentValue = (ownedShares * parseFloat(data.ltp)).toFixed(2);  // Calculate current value
+                        var ownershipHtml = `<div><b>Shares owned:</b> ${ownedShares}</div><div><b>Current value:</b> $${currentValue}</div>`;
+                        
+                        $('#stockOwnership').html(ownershipHtml);
+                    }).fail(function() {
+                        $('#stockOwnership').html('Unable to fetch ownership details');
+                    });
+                    var symbolCode = symbol.split('-')[1];
+                    var newsUrl = `https://news.google.com/search?q=${symbolCode}&hl=en-US&gl=US&ceid=US%3Aen`;
+                    
+                    $('#newsButton').off('click').on('click', function() {
+                        window.open(newsUrl, '_blank');
+                    });
+
                 } else {
                     $('#stockInfo').html('Error: ' + data.error);
                 }

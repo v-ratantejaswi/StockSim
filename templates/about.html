@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>StockSim - About</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column; 
+            background: #f5f5f5;
+        }
+    
+        nav {
+            flex: 0 1 auto;
+            background: #f5f5f5;
+        }
+
+        #content {
+            flex: 1 1 auto;
+            padding: 20px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .social-links {
+            display: flex; 
+            justify-content: start; 
+            gap: 20px;
+        }
+
+        .social-icon i {
+            font-size: 30px;
+        }
+
+        .social-icon i.fa-linkedin {
+            color: #0077b5; 
+        }
+
+        .social-icon i.fa-github {
+            color: #333;
+        }
+
+        .navbar-dollar {
+            font-size: 1.5rem;
+            margin-right: -1px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary" style="border-bottom: 5px solid green;">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}"><span class="navbar-dollar">💰</span>tockSim</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link " href="{{ url_for('index') }}" aria-current="page">Home</a>
+                    </li>
+
+                    {% if 'user_name' in session %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('trade') }}">Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" style="font-weight: bold; color: green; ">Balance: ${{ balance }}</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('signup') }}">Signup</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" onclick = "showPopup();return false;" >🔒 Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        
+                    {% endif %}
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="content">
+        <h1>About StockSim</h1>
+        <p>Welcome to StockSim, a dynamic platform designed to simulate the stock market and provide users with a risk-free environment to practice trading strategies, learn about market trends, and improve their trading skills.</p>
+
+        <h2>Our Mission</h2>
+        <p>Our mission is to provide a comprehensive and realistic trading simulation to help both new and experienced traders refine their trading tactics and decisions without financial risk.</p>
+
+        <h2>Contact Information</h2>
+        <p>For more information, collaboration, or support, please contact us:</p>
+        <div>
+            <h3>Ratan Tejaswi Vadapalli</h3>
+            <p>Email: ratantejaswi@gmail.com</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/ratan-tejaswi-vadapalli" target="_blank" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/v-ratantejaswi" target="_blank" class="social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://ratan.azurewebsites.net/" target = "_blank" class="social-icon"><i class="fa fa-folder"></i></a>
+            </div>
+        </div><br>
+
+        <h2>Privacy Statement</h2>
+        <p>We respect your privacy. StockSim is committed to protecting the confidentiality and security of all participants using our platform:</p>
+        <ul>
+            <li><strong>Data Protection:</strong> We ensure that all personal information is securely managed and kept confidential. The only data stored is name, email id and password.</li>
+            <li><strong>User Anonymity:</strong> We prioritize user anonymity in trading activities, with no real money involved and no personal trading data shared with any third parties.</li>
+        </ul>
+
+        <h2>About the Developer</h2>
+        <p>This platform was developed by Ratan Tejaswi, a passionate software developer and tech enthusiast. StockSim is designed to empower individuals to learn and grow in the financial markets securely and informatively.</p>
+        <p>Feedback is greatly appreciated to improve the platform and adapt to user needs.</p>
+    </div>
+    <script>
+        function showPopup() {
+            alert("Please login to access this feature!");
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

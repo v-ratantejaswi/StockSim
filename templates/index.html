@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/favicon.png" type="image/png">
+
     <title>StockSim</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -75,12 +77,24 @@
                 transform: translate(100vw, 100vh);
             }
         }
+
+        .dollar {
+            font-size: 7rem;
+            margin-right: -15px;
+        }
+
+        .navbar-dollar {
+            font-size: 1.5rem;
+            margin-right: -1px;
+        }
+
+
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}">StockSim</a>
+            <a class="navbar-brand" style="color: black;" href="{{ url_for('index') }}"><span class="navbar-dollar">💰</span>tockSim</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -89,9 +103,7 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ url_for('index') }}" aria-current="page">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
-                    </li>
+
                     {% if 'user_name' in session %}
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a>
@@ -103,16 +115,30 @@
                             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link disabled" style="font-weight: bold; color: green; ">Balance: ${{ balance }}</a>
                         </li>
                     {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('login') }}">Login</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('signup') }}">Signup</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="" onclick = "showPopup();return false;" >🔒 Trade</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('about') }}">About</a>
+                        </li>
+                        
                     {% endif %}
+                    
                 </ul>
             </div>
         </div>
@@ -121,19 +147,21 @@
 
     <!-- Centered content area -->
     <div class="centered-content">
-        <h1>StockSim</h1>
+        <!-- <h1><span class="sparkling">$</span>tockSim</h1> -->
+        <h1><span class="dollar">💰</span>tockSim</h1>
         <p>
-            Welcome to StockSim, a virtual platform to explore stock trading, learn market strategies, and compete with fellow traders.
+            Welcome to StockSim, a virtual platform to explore stock trading, learn market strategies, and view latest stock news.
             Sharpen your financial skills and navigate the market with simulated investments!
         </p>
         {% if 'user_name' in session %}
             <p>Welcome, {{ session['user_name'] }}!</p>
-            <a href="{{ url_for('logout') }}" class="btn btn-primary">Logout</a>
+            <a href="{{ url_for('trade') }}" class="btn btn-primary">Trade</a>
         {% else %}
             <div class="btn-group">
                 <a href="{{ url_for('signup') }}" class="btn btn-primary">Signup</a>
-                <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+                <a href="{{ url_for('login') }}" class="btn btn-primary">Login</a>
                 <a href="{{ url_for('explore') }}" class="btn btn-success">Explore</a>
+                <a onclick = "showPopup();return false;" class="btn btn-secondary">🔒 Trade</a>
             </div>
         {% endif %}
     </div>
@@ -166,6 +194,17 @@
             // Randomize the animation delay so all don't start at the same time
             symbol.style.animationDelay = `${Math.random() * 1}s`;
         });
+
+        function showPopup() {
+            alert('Please login to access trade and other features like view stock news.');
+            
+        }
     </script>
+
+<footer class="footer">
+    <div class="container" style="text-align: center;">
+        <h5>This is a project by Ratan Tejaswi Vadapalli. <a href= {{url_for('about')}}>Click</a> to learn more.</h5>
+    </div>
+</footer>
 </body>
 </html>

@@ -7,7 +7,7 @@ import bcrypt
 from flask_mail import Mail, Message
 import random
 from bson.objectid import ObjectId
-
+import time
 
 app = Flask(__name__)
 app.secret_key = os.environ['SECRET_KEY']
@@ -30,10 +30,8 @@ mail = Mail(app)
 
 def get_stock_info(symbol):
     res = {}
-    print(symbol)
     x = symbol.split('-')
     stock = yf.Ticker(x[0])
-    print(x)
     res['symbol'] = x[0]
     res['name'] = x[1]
     res['ltp'] = stock.basic_info['lastPrice']
@@ -102,7 +100,7 @@ def signup():
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         # Insert new user into the database
-        new_user = {"name": name, "email": email, "password": hashed_password, "balance": 10000}
+        new_user = {"name": name, "email": email, "password": hashed_password, "balance": 20000}
         users_collection.insert_one(new_user)
 
         # Success message and redirect to login
@@ -113,23 +111,6 @@ def signup():
 
 
 
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'POST':
-#         email = request.form['email']
-#         password = request.form['password']
-#         user = users_collection.find_one({"email": email})
-
-#         if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
-#             # Password matches, start session
-#             session['user_id'] = str(user['_id'])  # Use the user's ID from the database
-#             session['user_name'] = user['name']  # Store the user's name in session for personalization
-#             return redirect(url_for('index'))
-#         else:
-#             flash('Invalid email/password combination', 'danger')
-#             return redirect(url_for('login'))
-#     return render_template('login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -186,8 +167,27 @@ def trade():
         user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
         balance = user['balance'] if user else None
         return render_template('trade.html', balance=balance)
-    return render_template('trade.html', balance=None)
+    else:
+        flash("Please log in to access this feature.", "info")
+        return redirect(url_for('login'))
 
+@app.route('/get_stock_ownership', methods=['GET'])
+def get_stock_ownership():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+    
+    symbol = request.args.get('symbol', default='', type=str)
+    print("symbol is"+symbol)
+    if not symbol:
+        return jsonify({"error": "No symbol provided"}), 400
+
+    user_id = session['user_id']
+    portfolio_item = portfolio_collection.find_one({"user_id": ObjectId(user_id), "symbol": symbol})
+
+    if portfolio_item:
+        return jsonify({"owned_stocks": portfolio_item['quantity']})
+    else:
+        return jsonify({"owned_stocks": 0})
 
 
 @app.route('/stock_data', methods=['GET'])
@@ -235,8 +235,8 @@ def buy_stock():
 
     amount = round(amount, 2)  # Ensure the amount is rounded to two decimal places
 
-    if amount <= 0:
-        return jsonify({"error": "Invalid purchase quantity. Please enter a value above 0."}), 400
+    if amount < 1:
+        return jsonify({"error": "Invalid purchase quantity. Please enter a value above or equal to 1."}), 400
 
     if user['balance'] < amount:
         return jsonify({"error": "Insufficient balance"}), 400
@@ -310,8 +310,8 @@ def sell_stock():
     elif transaction_type == 'shares':
         quantity = amount
 
-    if amount <= 0:
-        return jsonify({"error": "Invalid sell quantity. Please enter a value above 0."}), 400
+    if amount < 1:
+        return jsonify({"error": "Invalid sell quantity. Please enter a value above or equal to 1."}), 400
 
     # Check if the user has enough shares to sell
     if quantity > portfolio_item['quantity']:
@@ -348,6 +348,103 @@ def sell_stock():
     return jsonify({"message": "Stock sold successfully", "new_balance": new_balance}), 200
 
 
+# @app.route('/portfolio')
+# def portfolio():
+#     if 'user_id' not in session:
+#         flash("Please log in to view your portfolio", "info")
+#         return redirect(url_for('login'))
+
+#     user_id = session['user_id']
+#     portfolio = portfolio_collection.find({"user_id": ObjectId(user_id)})
+
+#     stocks = []
+#     total_pl = 0
+#     for item in portfolio:
+#         symbol = item['symbol']
+#         stock_data = get_stock_info(symbol + "-SomeName")  # Update this to your actual method for fetching stock data
+#         current_price = stock_data['ltp'] if 'ltp' in stock_data else 0
+#         formatted_buy_price = float("{:.2f}".format(item['buy_price']))
+#         formatted_current_price = float("{:.2f}".format(current_price))
+#         total_value = item['quantity'] * current_price
+#         pl = (current_price - item['buy_price']) * item['quantity']
+#         formatted_total_value = float("{:.2f}".format(total_value))
+#         formatted_pl = float("{:.2f}".format(pl))
+#         total_pl += float(pl)
+#         stocks.append({
+#             "symbol": symbol,
+#             "quantity": item['quantity'],
+#             "buy_price": formatted_buy_price,
+#             "current_price": formatted_current_price,
+#             "total_value": formatted_total_value,
+#             "pl": formatted_pl
+#         })
+
+#     user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+#     balance = user['balance'] if user else None
+#     return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=(total_pl))
+
+# @app.route('/api/update_portfolio')
+# def update_portfolio():
+#     if 'user_id' not in session:
+#         return jsonify({"error": "User not logged in"}), 401
+
+#     user_id = session['user_id']
+#     portfolio_items = portfolio_collection.find({"user_id": ObjectId(user_id)})
+#     updated_stocks = []
+#     total_pl = 0
+
+#     for item in portfolio_items:
+#         symbol = item['symbol']
+#         stock_info = get_stock_info(symbol)
+#         if 'ltp' in stock_info:
+            
+#             current_price = float("{:.2f}".format(stock_info['ltp']))
+#             buy_price = float("{:.2f}".format(item['buy_price']))
+#             quantity = item['quantity']
+#             current_total_value = current_price * quantity
+#             pl = (current_price - buy_price) * quantity
+
+#             updated_stocks.append({
+#                 "symbol": symbol,
+#                 "quantity": quantity,
+#                 "buy_price": buy_price,
+#                 "current_price": current_price,
+#                 "total_value": current_total_value,
+#                 "pl": pl
+#             })
+
+#             total_pl += pl
+
+#     return jsonify({"stocks": updated_stocks, "total_pl": total_pl})
+
+
+def calculate_portfolio_values(user_id):
+    portfolio_items = portfolio_collection.find({"user_id": ObjectId(user_id)})
+    stocks = []
+    total_pl = 0
+    port_value = 0
+
+    for item in portfolio_items:
+        stock_info = get_stock_info(item['symbol'])
+        if 'ltp' in stock_info:
+            current_price = float("{:.2f}".format(stock_info['ltp']))
+            buy_price = float("{:.2f}".format(item['buy_price']))
+            quantity = item['quantity']
+            current_total_value = float("{:.2f}".format(current_price * quantity))
+            pl = round(float("{:.2f}".format((current_price - buy_price) * quantity)))
+            stocks.append({
+                "symbol": item['symbol'],
+                "quantity": quantity,
+                "buy_price": buy_price,
+                "current_price": current_price,
+                "total_value": current_total_value,
+                "pl": pl
+            })
+            port_value += current_total_value
+            total_pl += pl
+
+    return stocks, total_pl, port_value
+
 @app.route('/portfolio')
 def portfolio():
     if 'user_id' not in session:
@@ -355,33 +452,84 @@ def portfolio():
         return redirect(url_for('login'))
 
     user_id = session['user_id']
-    portfolio = portfolio_collection.find({"user_id": ObjectId(user_id)})
-
-    stocks = []
-    total_pl = 0
-    for item in portfolio:
-        symbol = item['symbol']
-        stock_data = get_stock_info(symbol + "-SomeName")  # Update this to your actual method for fetching stock data
-        current_price = stock_data['ltp'] if 'ltp' in stock_data else 0
-        formatted_buy_price = "{:.2f}".format(item['buy_price'])
-        formatted_current_price = "{:.2f}".format(current_price)
-        total_value = item['quantity'] * current_price
-        pl = (current_price - item['buy_price']) * item['quantity']
-        formatted_total_value = "{:.2f}".format(total_value)
-        formatted_pl = "{:.2f}".format(pl)
-        total_pl += int(pl)
-        stocks.append({
-            "symbol": symbol,
-            "quantity": item['quantity'],
-            "buy_price": formatted_buy_price,
-            "current_price": formatted_current_price,
-            "total_value": formatted_total_value,
-            "pl": formatted_pl
-        })
-
-    user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+    stocks, total_pl, port_value = calculate_portfolio_values(user_id)
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
     balance = user['balance'] if user else None
-    return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=str(total_pl))
+
+    return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=total_pl, port_value=port_value)
+
+@app.route('/api/update_portfolio')
+def update_portfolio():
+    if 'user_id' not in session:
+        return jsonify({"error": "User not logged in"}), 401
+
+    user_id = session['user_id']
+    stocks, total_pl, port_value = calculate_portfolio_values(user_id)
+
+    return jsonify({"stocks": stocks, "total_pl": total_pl, "port_value": port_value})
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+def send_password_email(email, password):
+    msg = Message('Your Password for StockSim', sender='stock-sim@outlook.com', recipients=[email])
+    msg.body = f'Your current password is: {password}\n\nPlease log in and change your password immediately for your security.'
+    mail.send(msg)
+
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form['email']
+        user = users_collection.find_one({"email": email})
+        if user:
+            # Generate OTP
+            otp = random.randint(100000, 999999)
+            session['otp'] = otp  # Store OTP in session
+            session['email_for_reset'] = email  # Store email to verify later
+
+            # Send OTP via email
+            msg = Message("Your OTP for Password Reset", sender='stock-sim@outlook.com', recipients=[email])
+            msg.body = f"Your OTP for resetting your password is {otp}. Please enter this code to proceed with setting a new password."
+            mail.send(msg)
+
+            flash('An OTP has been sent to your email. Please check your email to proceed with resetting your password.', 'info')
+            return redirect(url_for('verify_otp_for_reset'))
+        else:
+            flash('Email address not found. Please sign up.', 'danger')
+            return redirect(url_for('signup'))
+    return render_template('forgot-password.html')
+
+@app.route('/verify_otp_for_reset', methods=['GET', 'POST'])
+def verify_otp_for_reset():
+    if request.method == 'POST':
+        user_otp = request.form['otp']
+        if 'otp' in session and int(user_otp) == session['otp']:
+            return render_template('reset-password.html')  # A form to enter new password
+        else:
+            flash('Invalid OTP', 'danger')
+            return redirect(url_for('forgot_password'))
+    return render_template('verify-otp-for-reset.html')  # A simple form to enter OTP
+
+
+@app.route('/reset-password', methods=['POST'])
+def reset_password():
+    if request.method == 'POST':
+        new_password = request.form['new_password']
+        hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Ensure the email collected earlier is valid and set the new password
+        if 'email_for_reset' in session:
+            users_collection.update_one(
+                {"email": session['email_for_reset']},
+                {"$set": {"password": hashed_password}}
+            )
+            session.pop('email_for_reset', None)  # Clean up session
+            session.pop('otp', None)  # Clean up session
+            flash('Your password has been reset successfully. Please login with your new password.', 'success')
+            return redirect(url_for('login'))
+    return render_template('reset-password.html')  # Form to enter new password
 
 
 
