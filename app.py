@@ -20,11 +20,11 @@ transactions_collection = db['transactions']
 portfolio_collection = db['portfolio']
 
 
-app.config['MAIL_SERVER'] = 'smtp-mail.outlook.com'
+app.config['MAIL_SERVER'] = os.getenv("MAIL_SERVER")
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = "stock-sim@outlook.com"
-app.config['MAIL_PASSWORD'] = "StockSimulator@!123"
+app.config['MAIL_USERNAME'] = os.getenv("MAIL_USERNAME")
+app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
 mail = Mail(app)
 
 
