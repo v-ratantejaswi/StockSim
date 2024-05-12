@@ -187,20 +187,23 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('index') }}" aria-current="page">Home</a>
+                        <a class="nav-link " href="{{ url_for('index') }}" aria-current="page">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ url_for('explore') }}">Explore</a>
                     </li>
                     {% if 'user_name' in session %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('trade') }}">Trade</a>
+                            <a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ url_for('trade') }}">Trade</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link disabled" style="font-weight: bold; color: green; ">Balance: ${{ balance }}</a>
+                            <a class="nav-link disabled" style="font-weight: bold; color: green;" id="navbarBalance">Balance: ${{ balance }}</a>
                         </li>
                     {% else %}
                         <li class="nav-item">

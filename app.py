@@ -235,6 +235,9 @@ def buy_stock():
 
     amount = round(amount, 2)  # Ensure the amount is rounded to two decimal places
 
+    if amount <= 0:
+        return jsonify({"error": "Invalid purchase quantity. Please enter a value above 0."}), 400
+
     if user['balance'] < amount:
         return jsonify({"error": "Insufficient balance"}), 400
 
@@ -307,6 +310,9 @@ def sell_stock():
     elif transaction_type == 'shares':
         quantity = amount
 
+    if amount <= 0:
+        return jsonify({"error": "Invalid sell quantity. Please enter a value above 0."}), 400
+
     # Check if the user has enough shares to sell
     if quantity > portfolio_item['quantity']:
         return jsonify({"error": "Insufficient shares to sell"}), 400
@@ -352,6 +358,7 @@ def portfolio():
     portfolio = portfolio_collection.find({"user_id": ObjectId(user_id)})
 
     stocks = []
+    total_pl = 0
     for item in portfolio:
         symbol = item['symbol']
         stock_data = get_stock_info(symbol + "-SomeName")  # Update this to your actual method for fetching stock data
@@ -362,7 +369,7 @@ def portfolio():
         pl = (current_price - item['buy_price']) * item['quantity']
         formatted_total_value = "{:.2f}".format(total_value)
         formatted_pl = "{:.2f}".format(pl)
-
+        total_pl += int(pl)
         stocks.append({
             "symbol": symbol,
             "quantity": item['quantity'],
@@ -374,7 +381,7 @@ def portfolio():
 
     user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
     balance = user['balance'] if user else None
-    return render_template('portfolio.html', stocks=stocks, balance=balance)
+    return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=str(total_pl))
 
 
 

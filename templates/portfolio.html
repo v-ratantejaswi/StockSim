@@ -22,10 +22,10 @@
                         <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('trade') }}">Trade</a>
+                        <a class="nav-link active" href="{{ url_for('portfolio') }}">Portfolio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('portfolio') }}">Portfolio</a>
+                        <a class="nav-link" href="{{ url_for('trade') }}">Trade</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
@@ -33,13 +33,15 @@
                     <li class="nav-item">
                         <a class="nav-link disabled" style="font-weight: bold; color: green;" id="navbarBalance">Balance: ${{ balance }}</a>
                     </li>
-
                 </ul>
             </div>
         </div>
     </nav>
     <div id="mainCard" style="padding: 20px; margin-top: 80px;">
-        <h2>Your Portfolio</h2>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Your Portfolio</h2>
+            <div>Total P&L: ${{ total_pl }}</div>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -62,6 +64,10 @@
                     <td>${{ stock.pl }}</td>
                 </tr>
                 {% endfor %}
+                <tr>
+                    <td colspan="5" class="text-end"><strong>Total P&L</strong></td>
+                    <td><strong>${{ total_pl }}</strong></td>
+                </tr>
             </tbody>
         </table>
     </div>

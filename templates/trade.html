@@ -191,12 +191,15 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ url_for('index') }}" aria-current="page">Home</a>
+                        <a class="nav-link " href="{{ url_for('index') }}" aria-current="page">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('explore') }}">Explore</a>
                     </li>
                     {% if 'user_name' in session %}
+                        <li class="nav-item">
+                            <a class="nav-link " href="{{ url_for('portfolio') }}">Portfolio</a>
+                        </li>
                         <li class="nav-item">
                             <a class="nav-link active" href="{{ url_for('trade') }}">Trade</a>
                         </li>
@@ -348,6 +351,7 @@
         $(document).ready(function() {
             // Default stock symbol (Apple Inc.)
             const defaultStock = "AAPL-Apple Inc. Common Stock";
+            $('#inputField').val('AAPL-Apple Inc. Common Stock');
 
             // Load data for the default stock on page load
             updateStockInfo(defaultStock);
