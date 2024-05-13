@@ -269,7 +269,7 @@
         <div id="cardsContainer">
             <div id="leftCard">
                 <div id="stockInfo" style="text-align: center;color: black;"></div>
-                <button id="newsButton" class="btn btn-info" style="">View News</button>
+                <button id="newsButton" class="btn btn-info" >View News</button>
 
                 <div id="stockOwnership" style="padding: 10px; font-size: 16px; color: black;"></div>
 
@@ -456,23 +456,6 @@
 
             var refreshInterval;
 
-            // function scheduleAutoRefresh(symbol) {
-            //     // Clear any existing interval
-            //     clearInterval(refreshInterval);
-
-            //     // Set up a new interval to refresh every 30 seconds
-            //     refreshInterval = setInterval(() => {
-            //         updateStockDataAndInfo(symbol);
-            //     }, 30000); // 30,000 ms = 30 seconds
-            // }
-
-            // function updateStockDataAndInfo(symbol) {
-            //     // Update both stock info and stock chart
-            //     $.when(
-            //         updateStockInfo(symbol),
-            //         plotStockData(symbol, '1d')
-            //     );
-            // }
 
             function scheduleAutoRefresh(symbol) {
                 // Clear any existing interval
@@ -480,20 +463,22 @@
 
                 // Set up a new interval to refresh every 30 seconds
                 refreshInterval = setInterval(() => {
-                    const now = new Date();
-                    const currentHour = now.getHours();
-                    const currentMinute = now.getMinutes();
-
-                    // Check if the current time is between 9:30 and 15:59 (24-hour format)
-                    const isMarketOpen = (
-                        (currentHour === 9 && currentMinute >= 30) || // From 9:30 onwards
-                        (currentHour > 9 && currentHour < 16) // Before 16:00 (4 p.m.)
-                    );
-
-                    if (isMarketOpen) {
-                        updateStockDataAndInfo(symbol);
-                    } else {
-                        console.log("Market closed. Auto-refresh is paused.");
+                    if(currentPeriod === '1d') {
+                        const now = new Date();
+                        const currentHour = now.getHours();
+                        const currentMinute = now.getMinutes();
+            
+                        // Check if the current time is between 9:30 and 15:59 (24-hour format)
+                        const isMarketOpen = (
+                            (currentHour === 9 && currentMinute >= 30) || // From 9:30 onwards
+                            (currentHour > 9 && currentHour < 16) // Before 16:00 (4 p.m.)
+                        );
+            
+                        if (isMarketOpen) {
+                            updateStockDataAndInfo(symbol);
+                        } else {
+                            console.log("Market closed. Auto-refresh is paused.");
+                        }
                     }
                 }, 30000); // 30,000 ms = 30 seconds
             }
