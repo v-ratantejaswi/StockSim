@@ -46,16 +46,57 @@ def get_stock_info(symbol):
     res['yearChange'] = (res['ltp'] - yearopen) / yearopen * 100
     return res
 
+# def get_stock_data(symbol, period):
+#     x = symbol.split('-')
+#     stock = yf.Ticker(x[0])
+#     historical_prices = stock.history(period='1d', interval='1m')
+#     data = {
+#         "times": historical_prices.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
+#         "prices": historical_prices['Close'].tolist()  # Assuming you want to plot the closing prices
+#     }
+
+#     return data
+
+# @app.route('/stock_data', methods=['GET'])
+# def stock_data():
+#     symbol = request.args.get('symbol', default='', type=str)
+#     period = request.args.get('period', default='1d', type=str)  # '1d', '1wk', '1mo', '1yr'
+
+#     # Assume function `get_stock_data` fetches data according to period
+#     data = get_stock_data(symbol, period)
+#     return jsonify(data)
+
 def get_stock_data(symbol, period):
-    x = symbol.split('-')
-    stock = yf.Ticker(x[0])
-    historical_prices = stock.history(period='1d', interval='1m')
+    x = symbol.split('-')[0]
+    stock = yf.Ticker(x)
+    if period == '1d':
+        historical_prices = stock.history(period='1d', interval='1m')
+    elif period == '1mo':
+        historical_prices = stock.history(period='1mo', interval='1d')
+    elif period == '1y':
+        historical_prices = stock.history(period='1y', interval='1wk')  # adjusted to '1wk'
+    elif period == '5y':
+        historical_prices = stock.history(period='5y', interval='1mo')  # matches requirement
+    else:
+        return {"error": "Invalid period"}
+
     data = {
         "times": historical_prices.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
-        "prices": historical_prices['Close'].tolist()  # Assuming you want to plot the closing prices
+        "prices": historical_prices['Close'].tolist()
     }
-
     return data
+
+@app.route('/stock_data', methods=['GET'])
+def stock_data():
+    symbol = request.args.get('symbol', default='', type=str)
+    period = request.args.get('period', default='1d', type=str)
+    
+    if symbol:
+        data = get_stock_data(symbol, period)
+        if "error" in data:
+            return jsonify({"error": "Invalid period selected"}), 400
+        return jsonify(data)
+    return jsonify({"error": "Symbol not provided"}), 400
 
 @app.route('/stock_info', methods=['GET'])
 def stock_info():
@@ -190,14 +231,7 @@ def get_stock_ownership():
         return jsonify({"owned_stocks": 0})
 
 
-@app.route('/stock_data', methods=['GET'])
-def stock_data():
-    symbol = request.args.get('symbol', default='', type=str)
-    period = request.args.get('period', default='1d', type=str)  # '1d', '1wk', '1mo', '1yr'
 
-    # Assume function `get_stock_data` fetches data according to period
-    data = get_stock_data(symbol, period)
-    return jsonify(data)
 
 
 @app.route('/search', methods=['GET'])
@@ -431,7 +465,7 @@ def calculate_portfolio_values(user_id):
             buy_price = float("{:.2f}".format(item['buy_price']))
             quantity = item['quantity']
             current_total_value = float("{:.2f}".format(current_price * quantity))
-            pl = round(float("{:.2f}".format((current_price - buy_price) * quantity)))
+            pl = float("{:.2f}".format((current_price - buy_price) * quantity))
             stocks.append({
                 "symbol": item['symbol'],
                 "quantity": quantity,
