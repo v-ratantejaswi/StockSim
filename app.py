@@ -46,25 +46,7 @@ def get_stock_info(symbol):
     res['yearChange'] = (res['ltp'] - yearopen) / yearopen * 100
     return res
 
-# def get_stock_data(symbol, period):
-#     x = symbol.split('-')
-#     stock = yf.Ticker(x[0])
-#     historical_prices = stock.history(period='1d', interval='1m')
-#     data = {
-#         "times": historical_prices.index.strftime('%Y-%m-%d %H:%M:%S').tolist(),
-#         "prices": historical_prices['Close'].tolist()  # Assuming you want to plot the closing prices
-#     }
 
-#     return data
-
-# @app.route('/stock_data', methods=['GET'])
-# def stock_data():
-#     symbol = request.args.get('symbol', default='', type=str)
-#     period = request.args.get('period', default='1d', type=str)  # '1d', '1wk', '1mo', '1yr'
-
-#     # Assume function `get_stock_data` fetches data according to period
-#     data = get_stock_data(symbol, period)
-#     return jsonify(data)
 
 def get_stock_data(symbol, period):
     x = symbol.split('-')[0]
@@ -74,9 +56,9 @@ def get_stock_data(symbol, period):
     elif period == '1mo':
         historical_prices = stock.history(period='1mo', interval='1d')
     elif period == '1y':
-        historical_prices = stock.history(period='1y', interval='1wk')  # adjusted to '1wk'
+        historical_prices = stock.history(period='1y', interval='1wk') 
     elif period == '5y':
-        historical_prices = stock.history(period='5y', interval='1mo')  # matches requirement
+        historical_prices = stock.history(period='5y', interval='1mo')
     else:
         return {"error": "Invalid period"}
 
@@ -111,7 +93,7 @@ def index():
     if 'user_id' in session:
         user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
         balance = user['balance'] if user else None
-        return render_template('index.html', balance=balance)
+        return render_template('index.html', balance=round(balance, 2))
     return render_template('index.html', balance=None)
 
 @app.route('/explore')
@@ -125,26 +107,20 @@ def explore():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        # Retrieve user details from the form
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
 
-        # Check if a user with this email already exists
         existing_user = users_collection.find_one({"email": email})
         if existing_user:
-            # User already exists
             flash("An account with this email already exists.", "danger")
             return redirect(url_for('signup'))
 
-        # Encrypt the password
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        # Insert new user into the database
         new_user = {"name": name, "email": email, "password": hashed_password, "balance": 20000}
         users_collection.insert_one(new_user)
 
-        # Success message and redirect to login
         flash("User created successfully. Please log in.", "success")
         return redirect(url_for('login'))
 
@@ -161,17 +137,15 @@ def login():
         user = users_collection.find_one({"email": email})
 
         if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
-            # Generate OTP
             otp = random.randint(100000, 999999)
-            session['otp'] = otp  # Temporarily store OTP in session
-            session['email'] = email  # Temporarily store email to verify later
+            session['otp'] = otp  
+            session['email'] = email 
 
-            # Send OTP via email
             msg = Message("Your OTP", sender='stock-sim@outlook.com', recipients=[email])
             msg.body = f"Thank you for being a supporter of the StockSim app. The OTP for your current login session is {otp}"
             mail.send(msg)
 
-            return redirect(url_for('verify_otp'))  # Redirect to OTP verification page
+            return redirect(url_for('verify_otp'))
         else:
             flash('Invalid email/password combination', 'danger')
             return redirect(url_for('login'))
@@ -186,19 +160,19 @@ def verify_otp():
             # Correct OTP
             session['user_id'] = str(users_collection.find_one({"email": session['email']})['_id'])
             session['user_name'] = users_collection.find_one({"email": session['email']})['name']
-            session.pop('otp', None)  # Remove OTP from session after successful verification
-            session.pop('email', None)  # Remove email used for OTP
+            session.pop('otp', None) 
+            session.pop('email', None)  
             return redirect(url_for('index'))
         else:
             flash('Invalid OTP', 'danger')
             return redirect(url_for('verify_otp'))
 
-    return render_template('verify-otp.html')  # A simple form to enter OTP
+    return render_template('verify-otp.html') 
 
 
 @app.route('/logout')
 def logout():
-    session.clear()  # Clears all data from session
+    session.clear() 
     return redirect(url_for('index'))
 
 
@@ -207,7 +181,7 @@ def trade():
     if 'user_id' in session:
         user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
         balance = user['balance'] if user else None
-        return render_template('trade.html', balance=balance)
+        return render_template('trade.html', balance=round(balance, 2))
     else:
         flash("Please log in to access this feature.", "info")
         return redirect(url_for('login'))
@@ -249,7 +223,7 @@ def buy_stock():
 
     user_id = session['user_id']
     symbol = request.json.get('symbol')
-    transaction_type = request.json.get('type')  # 'dollars' or 'shares'
+    transaction_type = request.json.get('type')  
     amount = float(request.json.get('amount'))
 
     user = users_collection.find_one({"_id": ObjectId(user_id)})
@@ -265,9 +239,9 @@ def buy_stock():
         quantity = amount / ltp
     elif transaction_type == 'shares':
         quantity = amount
-        amount = quantity * ltp  # Calculate the total cost
+        amount = quantity * ltp  
 
-    amount = round(amount, 2)  # Ensure the amount is rounded to two decimal places
+    amount = round(amount, 2) 
 
     if amount < 1:
         return jsonify({"error": "Invalid purchase quantity. Please enter a value above or equal to 1."}), 400
@@ -275,14 +249,14 @@ def buy_stock():
     if user['balance'] < amount:
         return jsonify({"error": "Insufficient balance"}), 400
 
-    # Update the user's balance
+ 
     new_balance = round(user['balance'] - amount, 2)
     users_collection.update_one(
         {"_id": ObjectId(user_id)},
         {"$set": {"balance": new_balance}}
     )
 
-    # Record the transaction
+
     transaction = {
         "user_id": ObjectId(user_id),
         "symbol": symbol,
@@ -294,10 +268,10 @@ def buy_stock():
     }
     transactions_collection.insert_one(transaction)
 
-    # Update the portfolio
+   
     portfolio_item = portfolio_collection.find_one({"user_id": ObjectId(user_id), "symbol": symbol})
     if portfolio_item:
-        # Calculate the new weighted average price
+      
         total_quantity = portfolio_item['quantity'] + quantity
         total_spent = portfolio_item['buy_price'] * portfolio_item['quantity'] + amount
         new_buy_price = round(total_spent / total_quantity, 2)
@@ -307,7 +281,7 @@ def buy_stock():
             {"$set": {"quantity": total_quantity, "buy_price": new_buy_price}}
         )
     else:
-        # Insert new document with initial quantity and price
+        
         portfolio_collection.insert_one({
             "user_id": ObjectId(user_id),
             "symbol": symbol,
@@ -347,17 +321,17 @@ def sell_stock():
     if amount < 1:
         return jsonify({"error": "Invalid sell quantity. Please enter a value above or equal to 1."}), 400
 
-    # Check if the user has enough shares to sell
+
     if quantity > portfolio_item['quantity']:
         return jsonify({"error": "Insufficient shares to sell"}), 400
 
     sell_total = round(quantity * ltp, 2)
     new_balance = round(users_collection.find_one({"_id": ObjectId(user_id)})['balance'] + sell_total, 2)
 
-    # Update user's balance
+
     users_collection.update_one({"_id": ObjectId(user_id)}, {"$inc": {"balance": sell_total}})
 
-    # Record the transaction
+
     transactions_collection.insert_one({
         "user_id": ObjectId(user_id),
         "symbol": symbol,
@@ -368,7 +342,7 @@ def sell_stock():
         "date": datetime.datetime.now()
     })
 
-    # Update the portfolio entry
+  
     new_quantity = portfolio_item['quantity'] - quantity
     if new_quantity > 0:
         portfolio_collection.update_one(
@@ -376,80 +350,12 @@ def sell_stock():
             {"$set": {"quantity": new_quantity}}
         )
     else:
-        # If no shares left, delete the portfolio entry
+      
         portfolio_collection.delete_one({"user_id": ObjectId(user_id), "symbol": symbol})
 
     return jsonify({"message": "Stock sold successfully", "new_balance": new_balance}), 200
 
 
-# @app.route('/portfolio')
-# def portfolio():
-#     if 'user_id' not in session:
-#         flash("Please log in to view your portfolio", "info")
-#         return redirect(url_for('login'))
-
-#     user_id = session['user_id']
-#     portfolio = portfolio_collection.find({"user_id": ObjectId(user_id)})
-
-#     stocks = []
-#     total_pl = 0
-#     for item in portfolio:
-#         symbol = item['symbol']
-#         stock_data = get_stock_info(symbol + "-SomeName")  # Update this to your actual method for fetching stock data
-#         current_price = stock_data['ltp'] if 'ltp' in stock_data else 0
-#         formatted_buy_price = float("{:.2f}".format(item['buy_price']))
-#         formatted_current_price = float("{:.2f}".format(current_price))
-#         total_value = item['quantity'] * current_price
-#         pl = (current_price - item['buy_price']) * item['quantity']
-#         formatted_total_value = float("{:.2f}".format(total_value))
-#         formatted_pl = float("{:.2f}".format(pl))
-#         total_pl += float(pl)
-#         stocks.append({
-#             "symbol": symbol,
-#             "quantity": item['quantity'],
-#             "buy_price": formatted_buy_price,
-#             "current_price": formatted_current_price,
-#             "total_value": formatted_total_value,
-#             "pl": formatted_pl
-#         })
-
-#     user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
-#     balance = user['balance'] if user else None
-#     return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=(total_pl))
-
-# @app.route('/api/update_portfolio')
-# def update_portfolio():
-#     if 'user_id' not in session:
-#         return jsonify({"error": "User not logged in"}), 401
-
-#     user_id = session['user_id']
-#     portfolio_items = portfolio_collection.find({"user_id": ObjectId(user_id)})
-#     updated_stocks = []
-#     total_pl = 0
-
-#     for item in portfolio_items:
-#         symbol = item['symbol']
-#         stock_info = get_stock_info(symbol)
-#         if 'ltp' in stock_info:
-            
-#             current_price = float("{:.2f}".format(stock_info['ltp']))
-#             buy_price = float("{:.2f}".format(item['buy_price']))
-#             quantity = item['quantity']
-#             current_total_value = current_price * quantity
-#             pl = (current_price - buy_price) * quantity
-
-#             updated_stocks.append({
-#                 "symbol": symbol,
-#                 "quantity": quantity,
-#                 "buy_price": buy_price,
-#                 "current_price": current_price,
-#                 "total_value": current_total_value,
-#                 "pl": pl
-#             })
-
-#             total_pl += pl
-
-#     return jsonify({"stocks": updated_stocks, "total_pl": total_pl})
 
 
 def calculate_portfolio_values(user_id):
@@ -490,7 +396,7 @@ def portfolio():
     user = users_collection.find_one({"_id": ObjectId(user_id)})
     balance = user['balance'] if user else None
 
-    return render_template('portfolio.html', stocks=stocks, balance=balance, total_pl=total_pl, port_value=port_value)
+    return render_template('portfolio.html', stocks=stocks, balance=round(balance, 2), total_pl=round(total_pl,2), port_value=round(port_value,2))
 
 @app.route('/api/update_portfolio')
 def update_portfolio():
@@ -500,11 +406,16 @@ def update_portfolio():
     user_id = session['user_id']
     stocks, total_pl, port_value = calculate_portfolio_values(user_id)
 
-    return jsonify({"stocks": stocks, "total_pl": total_pl, "port_value": port_value})
+    return jsonify({"stocks": stocks, "total_pl": round(total_pl,2), "port_value": round(port_value,2)})
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    if 'user_id' in session:
+        user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
+        balance = user['balance'] if user else None
+        return render_template('about.html', balance=round(balance, 2))
+    else:
+        return render_template('about.html', balance=None)
 
 def send_password_email(email, password):
     msg = Message('Your Password for StockSim', sender='stock-sim@outlook.com', recipients=[email])
@@ -518,12 +429,12 @@ def forgot_password():
         email = request.form['email']
         user = users_collection.find_one({"email": email})
         if user:
-            # Generate OTP
+           
             otp = random.randint(100000, 999999)
-            session['otp'] = otp  # Store OTP in session
-            session['email_for_reset'] = email  # Store email to verify later
+            session['otp'] = otp  
+            session['email_for_reset'] = email 
 
-            # Send OTP via email
+     
             msg = Message("Your OTP for Password Reset", sender='stock-sim@outlook.com', recipients=[email])
             msg.body = f"Your OTP for resetting your password is {otp}. Please enter this code to proceed with setting a new password."
             mail.send(msg)
@@ -540,11 +451,11 @@ def verify_otp_for_reset():
     if request.method == 'POST':
         user_otp = request.form['otp']
         if 'otp' in session and int(user_otp) == session['otp']:
-            return render_template('reset-password.html')  # A form to enter new password
+            return render_template('reset-password.html')
         else:
             flash('Invalid OTP', 'danger')
             return redirect(url_for('forgot_password'))
-    return render_template('verify-otp-for-reset.html')  # A simple form to enter OTP
+    return render_template('verify-otp-for-reset.html')  
 
 
 @app.route('/reset-password', methods=['POST'])
@@ -553,17 +464,17 @@ def reset_password():
         new_password = request.form['new_password']
         hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
         
-        # Ensure the email collected earlier is valid and set the new password
+
         if 'email_for_reset' in session:
             users_collection.update_one(
                 {"email": session['email_for_reset']},
                 {"$set": {"password": hashed_password}}
             )
-            session.pop('email_for_reset', None)  # Clean up session
-            session.pop('otp', None)  # Clean up session
+            session.pop('email_for_reset', None) 
+            session.pop('otp', None) 
             flash('Your password has been reset successfully. Please login with your new password.', 'success')
             return redirect(url_for('login'))
-    return render_template('reset-password.html')  # Form to enter new password
+    return render_template('reset-password.html')
 
 
 

@@ -8,7 +8,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 
     <style>
@@ -24,25 +23,24 @@
             position: relative;
             z-index: 1050;
             border-bottom: 5px solid green;
-
         }
         #mainCard {
             margin-top: 10px;
             margin-bottom: 10px;
-            position: fixed; /* Fixed position */
-            top: 70px; /* Position top at the bottom of the navbar */
+            position: fixed; 
+            top: 70px; 
             left: 20px;
             right: 20px;
-            bottom: 0; /* Stretch to the bottom of the viewport */
+            bottom: 0; 
             background: white;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             padding: 20px;
             border-radius: 15px;
-            overflow: hidden; /* Hide overflow */
-            display: flex; /* Use flexbox */
-            flex-direction: column; /* Stack children vertically */
-            align-items: stretch; /* Stretch children to match the width */
-            box-sizing: border-box; /* Padding is included in the width and height */
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: stretch; 
+            box-sizing: border-box; 
             border: 2px dashed black;
         }
         #searchArea {
@@ -55,33 +53,27 @@
             z-index: 1;
             box-sizing:border-box;
         }
-
-
-
         #inputField {
             padding: 10px;
             font-size: 16px;
-            flex-grow: 1; /* Allows the input field to expand to fill available space */
-            margin-right: 10px; /* Ensures a small gap between the input field and button */
+            flex-grow: 1; 
+            margin-right: 10px; 
             border-radius: 10px;
             background-color: white;
             color: black;
         }
-
         #inputField::placeholder {
             color: black; 
         }
-
         #searchButton {
-            padding: 10px 20px; /* Adjust padding as needed */
+            padding: 10px 20px;
             font-size: 16px;
-            white-space: nowrap; /* Prevents text wrapping in the button */
-            flex-shrink: 0; /* Prevents the button from shrinking */
+            white-space: nowrap;
+            flex-shrink: 0; 
             border-radius: 10px;
             background-color: white;
             color: black;
         }
-
         #result {
             position: absolute;
             width: calc(100% - 40px);
@@ -96,13 +88,7 @@
             background: lightgray;
             z-index: 1000;
             border-radius: 10px;
-        } 
-
-
-
-
-
-
+        }
         #result ul {
             list-style-type: none;
             padding: 0;
@@ -115,59 +101,54 @@
         #result ul li:hover {
             background-color: #f0f0f0;
         }
-
-
         #cardsContainer {
             flex: 1; 
             display: flex;
             width: calc(100%); 
             overflow: hidden;
         }
-
         #leftCard, #rightCard {
             display: flex;
-            flex-direction: column; /* Stack card content vertically */
+            flex-direction: column; 
             height: 100%;
-            /* ... */
         }
         #leftCard {
             flex: 0 0 30%;
             max-width: 30%;
             background: white;
-            margin-right: 20px; /* Spacing between cards */
+            margin-right: 20px;
             padding: 20px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border: 1px solid black;
-            overflow-y: auto; /* Scrollable if content is too long */
+            overflow-y: auto; 
         }
         #rightCard {
-            flex: 0 0 68%;
-            max-width: 68%;
+            flex: 1; 
+            max-width: calc(100% - 40px); 
             background: white;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             border: 1px solid black;
             border-radius: 15px;
             margin-left: 10px;
-            overflow-y: auto; /* Scrollable if content is too long */
+            overflow: auto; 
             position: relative;
         }
         #loadingIndicator {
-            display: none; /* Hidden by default */
+            display: none; 
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%); /* Center the indicator */
-            width: auto; /* Adjust width to content size */
-            height: auto; /* Adjust height to content size */
-            text-align: center; /* Center the text below the spinner */
+            transform: translate(-50%, -50%); 
+            width: auto; 
+            height: auto; 
+            text-align: center; 
         }
-
         .spinner-border {
-            width: 3rem; /* Size of the spinner */
-            height: 3rem; /* Size of the spinner */
-            margin-bottom: 0.5rem; /* Space between spinner and text */
+            width: 3rem;
+            height: 3rem; 
+            margin-bottom: 0.5rem; 
         }
         .navbar-dollar {
             font-size: 1.5rem;
@@ -175,37 +156,31 @@
         }
         @media (max-width: 768px) {
             #cardsContainer {
-                flex-direction: column;  /* Stack the cards vertically */
+                flex-direction: column;  
             }
             #leftCard, #rightCard {
-                flex: 1 1 100%; /* Each card takes full width */
-                max-width: 100%; /* Override previous max-width settings */
-                margin-right: 0; /* Remove margin between cards */
-                margin-bottom: 20px; /* Add space between stacked cards */
+                flex: 1 1 100%; 
+                max-width: 100%; 
+                margin-right: 0;
+                margin-bottom: 20px; 
             }
             #rightCard {
-                overflow-x: auto; /* Enable horizontal scrolling for the chart area */
+                overflow-x: auto; 
             }
             .navbar {
-                flex-wrap: wrap; /* Allow navbar items to wrap */
+                flex-wrap: wrap; 
             }
         }
-
-        /* Enhance visibility on smaller screens */
         .canvas-container {
-            width: 1000px; /* Full width of the card */
-
+            width: 1000px; 
         }
-
         #stockChart {
-            min-width: 1000px;  /* Ensure the chart is wide enough to display data clearly */
+            min-width: 1000px; 
         }
         .period-selector {
-            position: static; /* Resets any position styling that may affect mobile views */
+            position: static; 
         }
     </style>
-    
-    
 </head>
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -259,7 +234,6 @@
             <button id="searchButton" style="background-color: green;color: white;">Get Info</button>
             <div id="result"></div>
         </div>
-        
         <div id="cardsContainer">
             <div id="leftCard">
                 <div id="stockInfo" style="text-align: center;color: black;"></div>
@@ -269,36 +243,23 @@
                     <div class="spinner-border text-primary" role="status"></div>
                     <span class="sr-only" style="color: black;">Loading...</span>
                 </div>
-                
                 <div class="canvas-container">
                     <canvas id="stockChart"></canvas>
                 </div><br>
-                <p id ="stockSummary" style="min-width: 1000px;"> </p>
-                
+                <p id="stockSummary" style="min-width: 1000px;"></p>
             </div>
         </div>
     </div>
-
-
-
     <script>
         function showPopup() {
             alert('Please login to access trade and other features like view stock news.');
-            
         }
-
         $(document).ready(function() {
-            // Default stock symbol (Apple Inc.)
             const defaultStock = "AAPL-Apple Inc. Common Stock";
-
-            // Load data for the default stock on page load
             updateStockInfo(defaultStock);
             plotStockData(defaultStock, '1d');
             plotStockData(defaultStock, '1d');
-
-            // Schedule automatic updates for the default stock
             scheduleAutoRefresh(defaultStock);
-
             $('#inputField').on('input', function() {
                 var userInput = $(this).val();
                 if (userInput.length > 0) {
@@ -317,102 +278,56 @@
                     $('#result').hide();
                 }
             });
-        
             $('#result').on('click', 'li', function() {
                 var symbol = $(this).data('symbol');
                 var name = $(this).data('name');
                 $('#inputField').val(symbol + '-' + name);
                 $('#result').hide();
             });
-
-
             var refreshInterval;
-
-            // function scheduleAutoRefresh(symbol) {
-            //     // Clear any existing interval
-            //     clearInterval(refreshInterval);
-
-            //     // Set up a new interval to refresh every 30 seconds
-            //     refreshInterval = setInterval(() => {
-            //         updateStockDataAndInfo(symbol);
-            //     }, 30000); // 30,000 ms = 30 seconds
-            // }
-
-            // function updateStockDataAndInfo(symbol) {
-            //     // Update both stock info and stock chart
-            //     $.when(
-            //         updateStockInfo(symbol),
-            //         plotStockData(symbol, '1d')
-            //     );
-            // }
-
             function scheduleAutoRefresh(symbol) {
-                // Clear any existing interval
                 clearInterval(refreshInterval);
-
-                // Set up a new interval to refresh every 30 seconds
                 refreshInterval = setInterval(() => {
                     const now = new Date();
                     const currentHour = now.getHours();
                     const currentMinute = now.getMinutes();
-
-                    // Check if the current time is between 9:30 and 15:59 (24-hour format)
                     const isMarketOpen = (
-                        (currentHour === 9 && currentMinute >= 30) || // From 9:30 onwards
-                        (currentHour > 9 && currentHour < 16) // Before 16:00 (4 p.m.)
+                        (currentHour === 9 && currentMinute >= 30) ||
+                        (currentHour > 9 && currentHour < 16)
                     );
-
                     if (isMarketOpen) {
                         updateStockDataAndInfo(symbol);
                     } else {
                         console.log("Market closed. Auto-refresh is paused.");
                     }
-                }, 30000); // 30,000 ms = 30 seconds
+                }, 30000);
             }
-
             function updateStockDataAndInfo(symbol) {
-                // Update both stock info and stock chart
                 $.when(
                     updateStockInfo(symbol),
                     plotStockData(symbol, '1d')
                 );
             }
-
             $('#searchButton').click(function() {
-                var symbol = $('#inputField').val(); // Assume symbol is part of the input
+                var symbol = $('#inputField').val();
                 if (symbol) {
-                    showLoadingIndicator(); // Show loading indicator when the button is clicked
+                    showLoadingIndicator();
                     $.when(
-                        updateStockInfo(symbol),  // Fetch and display stock info
+                        updateStockInfo(symbol),
                         plotStockData(symbol, '1d'),
-                        plotStockData(symbol, '1d')  
+                        plotStockData(symbol, '1d')
                     ).then(() => {
                         hideLoadingIndicator();
-                        scheduleAutoRefresh(symbol); // Schedule the periodic data refresh
+                        scheduleAutoRefresh(symbol);
                     });
                 }
             });
-
-
-            // $('#searchButton').click(function() {
-            //     var symbol = $('#inputField').val(); // Assume symbol is part of the input
-            //     if (symbol) {
-            //         showLoadingIndicator(); // Show loading indicator when the button is clicked
-            //         $.when(
-            //             updateStockInfo(symbol),  // Fetch and display stock info
-            //             plotStockData(symbol, '1d')  // Fetch and display stock chart
-            //         ).then(hideLoadingIndicator);  // Hide loading indicator once both requests are completed
-            //     }
-            // });
-        
             $(document).on('click', function(e) {
                 if (!$(e.target).closest('#inputField').length && !$(e.target).closest('#result').length) {
                     $('#result').hide();
                 }
             });
         });
-
-
         function plotStockData(symbol, period) {
             return $.getJSON('/stock_data', {symbol: symbol, period: period}, function(data) {
                 const ctx = document.getElementById('stockChart').getContext('2d');
@@ -420,27 +335,21 @@
                     x: data.times[index],
                     y: price
                 }));
-
-
                 const isPriceDown = data.prices[data.prices.length-1] < data.prices[0];
                 const lineColor = isPriceDown ? 'red' : 'green';
                 const backgroundColor = isPriceDown ? 'rgba(255, 0, 0, 0.2)' : 'rgba(0, 255, 0, 0.2)';
-
                 const gradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height);
                 if (isPriceDown) {
-                    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)'); // Red, semi-transparent
-                    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)'); // Transparent
+                    gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');
+                    gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
                 } else {
-                    gradient.addColorStop(0, 'rgba(0, 255, 0, 0.5)'); // Greenish-blue, semi-transparent
-                    gradient.addColorStop(1, 'rgba(0, 255, 0, 0)'); // Transparent
+                    gradient.addColorStop(0, 'rgba(0, 255, 0, 0.5)');
+                    gradient.addColorStop(1, 'rgba(0, 255, 0, 0)');
                 }
-
                 const lastUpdated = data.times[data.times.length - 1];
-
                 if (window.stockChart instanceof Chart) {
-                    window.stockChart.destroy(); // Destroy the existing chart instance if exists
+                    window.stockChart.destroy();
                 }
-
                 window.stockChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -450,8 +359,8 @@
                             backgroundColor: gradient,
                             data: dataPoints,
                             fill: true,
-                            pointRadius: 0, // Points are hidden by default
-                            hoverRadius: 6 // Points are visible when hovered
+                            pointRadius: 0,
+                            hoverRadius: 6
                         }]
                     },
                     options: {
@@ -505,17 +414,15 @@
                                         return `Time: ${tooltipItems[0].label}`;
                                     }
                                 }
-                            }
-                        },
-                        interaction: {
-                            mode: 'nearest', // Trigger tooltip on nearest data point
-                            intersect: false // Trigger when cursor is near a point
-                        },
-                        plugins: {
+                            },
                             title: {
                                 display: true,
                                 text: `Last Updated: ${lastUpdated}`
                             }
+                        },
+                        interaction: {
+                            mode: 'nearest',
+                            intersect: false
                         }
                     }
                 });
@@ -523,22 +430,15 @@
                 console.error("Failed to fetch data: ", textStatus, errorThrown);
             });
         }
-
-
-
-
-
         function updateStockInfo(symbol) {
             return $.getJSON('/stock_info', {symbol: symbol}, function(data) {
                 if (!data.error) {
                     var yearChangeArrow = data.yearChange >= 0 ? 
-                                        '<span style="color:green;">&#9650;</span>' : // Upward arrow in green
-                                        '<span style="color:red;">&#9660;</span>'; // Downward arrow in red
-
+                                        '<span style="color:green;">&#9650;</span>' : 
+                                        '<span style="color:red;">&#9660;</span>'; 
                     var ltpArrow = data.ltp >= data.open ? 
-                                        '<span style="color:green;">&#9650;</span>' : // Upward arrow in green
-                                        '<span style="color:red;">&#9660;</span>'; // Downward arrow in red
-
+                                        '<span style="color:green;">&#9650;</span>' : 
+                                        '<span style="color:red;">&#9660;</span>'; 
                     var infoHtml = '<h3>' + data.symbol + '</h3><br>' +
                                     '<h3>' + data.name + '</h3> <br>' +
                         '<table style="width: 100%; border-collapse:">' +
@@ -558,18 +458,10 @@
                 }
             });
         }
-
-
-
-
-        
         function scheduleUpdates(symbol) {
-            // Cancel any existing interval to prevent overlapping updates
             clearInterval(window.updateInterval);
-
             const now = new Date();
             const msUntilNextUpdate = (5 - (now.getSeconds() % 5)) * 1000 - now.getMilliseconds();
-            
             setTimeout(() => {
                 updateStockDataAndInfo(symbol); 
                 window.updateInterval = setInterval(() => {
@@ -577,18 +469,13 @@
                 }, 30000);
             }, msUntilNextUpdate);
         }
-
         function showLoadingIndicator() {
             $('#loadingIndicator').show();
         }
-
         function hideLoadingIndicator() {
             $('#loadingIndicator').hide();
         }
-
-
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
 </body>
 </html>
