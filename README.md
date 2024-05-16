@@ -34,8 +34,6 @@ StockSim is a stock trading simulation web application that allows users to expl
 ### Prerequisites
 - Python 3.8 or higher
 - MongoDB
-- Node.js (for npm)
-- Docker (optional, for containerized deployment)
 
 ### Installation Steps
 1. **Clone the repository**:
