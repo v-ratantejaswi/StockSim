@@ -22,13 +22,14 @@ StockSim is a stock trading simulation web application that allows users to expl
 - Simulated Trading
   - Buy and sell stocks using either dollar amounts or share quantities
   - Portfolio management showing current holdings, average buy price, current LTP, total value, and profit/loss
+- View Latest Stock News
 - Automatic Portfolio Updates
 - Responsive design
 
 ## Tech Stack
 - **Backend**: Flask, MongoDB, yFinance, Flask-Mail, Bcrypt
 - **Frontend**: HTML, CSS, JavaScript, jQuery, Bootstrap, Chart.js
-- **Other**: Docker (for deployment), GitHub Actions (for CI/CD)
+- **Other**: Microsoft Azure(deployment), GitHub Actions (for CI/CD)
 
 ## Setup and Installation
 ### Prerequisites
