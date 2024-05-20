@@ -24,15 +24,15 @@
             border-bottom: 5px solid green;
         }
 
-        /* Center the main content */
+        
         .centered-content {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            height: 100vh; /* Full viewport height */
-            margin-top: -70px; /* Adjust for navbar height */
+            height: 100vh; 
+            margin-top: -70px; 
         }
 
         h1 {
@@ -109,7 +109,7 @@
         </div>
     </nav>
 
-    <!-- Centered content area -->
+
     <div class="centered-content">
         <h1>Create an account</h1>
         <div class="form-container">
@@ -151,7 +151,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Email validation
+    
             const emailInput = document.getElementById('email');
             const emailValidationMessage = document.getElementById('email-validation');
 
@@ -164,7 +164,7 @@
                 }
             });
 
-            // Password confirmation validation
+
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirm-password');
             const passwordValidationMessage = document.getElementById('password-validation');
@@ -180,10 +180,10 @@
             passwordInput.addEventListener('input', validatePasswords);
             confirmPasswordInput.addEventListener('input', validatePasswords);
 
-            // Form submission validation
+
             const signupForm = document.getElementById('signup-form');
             signupForm.addEventListener('submit', function (event) {
-                // Prevent form submission if validation errors exist
+   
                 if (emailValidationMessage.style.display === 'block' || passwordValidationMessage.style.display === 'block') {
                     event.preventDefault();
                 }

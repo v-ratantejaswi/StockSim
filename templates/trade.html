@@ -50,9 +50,10 @@
             width: 100%;
             position: relative;
             padding: 10px;
-            z-index: 2; /* Ensure it is above other content */
+            z-index: 2; 
             box-sizing: border-box;
         }
+        
         #inputField {
             padding: 10px;
             font-size: 16px;
@@ -86,7 +87,7 @@
             top: 60px;
             background: white;
             border-radius: 10px;
-            z-index: 9999; /* Ensure it is on top */
+            z-index: 9999; 
         }
         .btn-group {
             gap: 20px;
@@ -125,21 +126,10 @@
             border: 1px solid black;
             overflow-y: auto;
         }
-        /* #rightCard {
-            flex: 0 0 68%;
-            max-width: 68%;
-            background: white;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            border: 1px solid black;
-            border-radius: 15px;
-            margin-left: 10px;
-            overflow: auto;
-            position: relative;
-        } */
+
         #rightCard {
-            flex: 1; /* Allows the right card to take up the remaining space */
-            max-width: calc(100% - 40px); /* Ensures the right border is visible */
+            flex: 1;
+            max-width: calc(100% - 40px); 
             background: white;
             padding: 20px;
             box-shadow: 0 4px 8px rgba(0,0,0,0.3);
@@ -244,8 +234,9 @@
     </nav>
     <div id="mainCard">
         <div id="searchArea">
+            
             <input type="text" id="inputField" placeholder="Search Symbol or Company">
-            <button id="searchButton" style="background-color: green;color: white;">Get Info</button>
+            <button id="searchButton" style="background-color: green;color: white;">Get Stock</button>
             <div id="result"></div>
         </div>
         <div id="cardsContainer">
@@ -298,6 +289,7 @@
         </div>
     </div>
     <script>
+        let currentPeriod = '1d'; 
         $(document).ready(function() {
             $('#buyButton').click(function() {
                 var symbol = $('#inputField').val();
@@ -315,7 +307,7 @@
                         }),
                         success: function(response) {
                             $('#navbarBalance').text('Balance: $' + response.new_balance);
-                            updateStockInfo(symbol);  // Update the shares owned and current value
+                            updateStockInfo(symbol);  
                             alert('Stock purchased successfully. New Balance: $' + response.new_balance);
                         },
                         error: function(xhr) {
@@ -342,7 +334,7 @@
                         }),
                         success: function(response) {
                             $('#navbarBalance').text('Balance: $' + response.new_balance);
-                            updateStockInfo(symbol);  // Update the shares owned and current value
+                            updateStockInfo(symbol); 
                             alert('Stock sold successfully. New Balance: $' + response.new_balance);
                         },
                         error: function(xhr) {
@@ -392,10 +384,12 @@
                 $('#result').hide();
             });
             var refreshInterval;
+
+
             function scheduleAutoRefresh(symbol) {
                 clearInterval(refreshInterval);
                 refreshInterval = setInterval(() => {
-                    if(currentPeriod === '1d') {
+                    if (currentPeriod === '1d') {
                         const now = new Date();
                         const currentHour = now.getHours();
                         const currentMinute = now.getMinutes();
@@ -411,6 +405,7 @@
                     }
                 }, 30000);
             }
+
             function updateStockDataAndInfo(symbol) {
                 $.when(
                     updateStockInfo(symbol),
@@ -557,11 +552,18 @@
                 console.error("Failed to fetch data: ", textStatus, errorThrown);
             });
         }
+
         $('#periodSelect').change(function() {
             var selectedPeriod = $(this).val();
+            currentPeriod = selectedPeriod; 
             var symbol = $('#inputField').val().split('-')[0];
             if (symbol) {
                 plotStockData(symbol, selectedPeriod);
+                if (selectedPeriod === '1d') {
+                    scheduleAutoRefresh(symbol); 
+                } else {
+                    clearInterval(refreshInterval); 
+                }
             }
         });
         function updateStockInfo(symbol) {
